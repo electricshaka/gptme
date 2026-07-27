@@ -335,7 +335,7 @@ class PromptOptimizer:
         avg_composite = compose_metric_scores(avg_task, avg_tool, avg_judge)
         composite_scores = [
             compose_metric_scores(t, tool, j)
-            for t, tool, j in zip(task_scores, tool_scores, judge_scores)
+            for t, tool, j in zip(task_scores, tool_scores, judge_scores, strict=True)
         ]
 
         return {

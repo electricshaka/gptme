@@ -276,7 +276,7 @@ def print_msg(
     msgs = msg if isinstance(msg, list) else [msg]
     msgstrs = format_msgs(msgs, highlight=highlight, oneline=oneline)
     skipped_hidden = 0
-    for m, s in zip(msgs, msgstrs):
+    for m, s in zip(msgs, msgstrs, strict=True):
         if m.hide and not show_hidden:
             skipped_hidden += 1
             continue

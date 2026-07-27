@@ -367,7 +367,7 @@ def set_default_model(model: str | ModelMeta) -> None:
     DEFAULT_MODEL = modelmeta
 
 
-_logged_warnings = set()
+_logged_warnings: set[str] = set()
 
 
 def log_warn_once(msg: str):

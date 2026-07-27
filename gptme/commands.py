@@ -536,4 +536,4 @@ def print_available_models() -> None:
 def get_user_commands() -> list[str]:
     """Returns a list of all user commands, including tool-registered commands"""
     # Get all registered commands (includes built-in + tool-registered)
-    return [f"/{cmd}" for cmd in _command_registry.keys()]
+    return [f"/{cmd}" for cmd in _command_registry]

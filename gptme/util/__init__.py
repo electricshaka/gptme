@@ -11,7 +11,6 @@ from datetime import datetime, timedelta
 from functools import lru_cache
 from pathlib import Path
 
-from rich import print
 from rich.console import Console
 
 EMOJI_WARN = "⚠️"
@@ -19,7 +18,7 @@ EMOJI_WARN = "⚠️"
 logger = logging.getLogger(__name__)
 console = Console(log_path=False)
 
-_warned_models = set()
+_warned_models: set[str] = set()
 
 
 @lru_cache
@@ -78,7 +77,7 @@ def example_to_xml(s: str) -> str:
     """
     s = clean_example(s)
     orig = s
-    print(f"After clean_example: {s!r}")  # Debug print
+    logger.debug(f"After clean_example: {s!r}")
 
     lines = s.split("\n")
     result = []
@@ -123,7 +122,7 @@ def example_to_xml(s: str) -> str:
         )
 
     s = "\n".join(result).strip()
-    print(f"Final result: {s!r}")  # Debug print
+    logger.debug(f"Final result: {s!r}")
     assert s != orig, "Couldn't find place to put start of directive"
     return s
 
