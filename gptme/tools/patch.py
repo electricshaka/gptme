@@ -187,7 +187,7 @@ class Patch:
                     raise ValueError(
                         "different number of placeholders in original and modified chunks"
                     )
-                for orig, mod in zip(originals, modifieds):
+                for orig, mod in zip(originals, modifieds, strict=True):
                     if orig == mod:
                         continue
                     yield Patch(orig, mod)

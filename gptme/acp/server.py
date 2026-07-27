@@ -10,16 +10,9 @@ import json
 import logging
 import sys
 import threading
-from pathlib import Path
 
 from ..__version__ import __version__
-from ..chat import chat
-from ..config import ChatConfig, Config, set_config
-from ..dirs import get_logs_dir
-from ..llm.models import get_default_model
-from ..logmanager import LogManager, prepare_messages
-from ..message import Message
-from ..tools import ToolFormat, get_available_tools, init_tools
+from ..tools import get_available_tools
 
 logger = logging.getLogger(__name__)
 
@@ -65,7 +58,7 @@ class ACPProtocolHandler:
     def handle_initialize(self, params: dict, id: int):
         """Handle the initialize request."""
         protocol_version = params.get("protocolVersion", 1)
-        client_capabilities = params.get("clientCapabilities", {})
+        _client_capabilities = params.get("clientCapabilities", {})
 
         if protocol_version != ACP_PROTOCOL_VERSION:
             self._send_error(
@@ -152,7 +145,7 @@ class ACPProtocolHandler:
         except Exception as e:
             logger.exception(f"Error executing tool {tool_name}: {e}")
             self._send_error(
-                id, -32603, f"Tool execution failed: {str(e)}"
+                id, -32603, f"Tool execution failed: {e!s}"
             )
 
     def handle_list_prompts(self, params: dict, id: int):

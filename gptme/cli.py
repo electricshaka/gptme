@@ -168,7 +168,7 @@ def main(
     if profile:
         import cProfile
         import pstats
-        from datetime import datetime
+        from datetime import datetime, timezone
 
         print("Profiling enabled...")
         pr = cProfile.Profile()
@@ -177,7 +177,7 @@ def main(
         profile_dir = Path("profiles")
         profile_dir.mkdir(exist_ok=True)
         profile_path = (
-            profile_dir / f"gptme-{datetime.now().strftime('%Y%m%d-%H%M%S')}.prof"
+            profile_dir / f"gptme-{datetime.now(tz=timezone.utc).strftime('%Y%m%d-%H%M%S')}.prof"
         )
 
         def save_profile():
