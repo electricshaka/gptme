@@ -11,46 +11,33 @@ Hook Types
 
 The following hook types are available:
 
-Turn And Step Lifecycle Hooks
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Message Lifecycle Hooks
+~~~~~~~~~~~~~~~~~~~~~~~~
 
-- ``TURN_PRE``: Once per submitted user prompt, before the turn starts
-- ``STEP_PRE``: Before each generation/tool-execution step within a turn
-- ``STEP_POST``: After each step completes
-- ``TURN_POST``: After the whole turn completes
-- ``MESSAGE_TRANSFORM``: Rewrite assistant message content before persistence/display
-
-``TURN_PRE`` is the clean "user prompt submitted" surface. ``STEP_PRE`` may run
-multiple times inside one turn if the assistant keeps calling tools.
+- ``MESSAGE_PRE_PROCESS``: Before processing a user message
+- ``MESSAGE_POST_PROCESS``: After message processing completes
+- ``MESSAGE_TRANSFORM``: Transform message content before processing
 
 Tool Lifecycle Hooks
-~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~
 
-- ``TOOL_EXECUTE_PRE``: Before executing any tool
-- ``TOOL_EXECUTE_POST``: After executing any tool
+- ``TOOL_PRE_EXECUTE``: Before executing any tool
+- ``TOOL_POST_EXECUTE``: After executing any tool
 - ``TOOL_TRANSFORM``: Transform tool execution
-- ``TOOL_CONFIRM``: Blocking confirmation/deny decision before execution
 
 File Operation Hooks
 ~~~~~~~~~~~~~~~~~~~~~
 
-- ``FILE_SAVE_PRE``: Before saving a file
-- ``FILE_SAVE_POST``: After saving a file
-- ``FILE_PATCH_PRE``: Before patching a file
-- ``FILE_PATCH_POST``: After patching a file
+- ``FILE_PRE_SAVE``: Before saving a file
+- ``FILE_POST_SAVE``: After saving a file
+- ``FILE_PRE_PATCH``: Before patching a file
+- ``FILE_POST_PATCH``: After patching a file
 
 Session Lifecycle Hooks
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
 - ``SESSION_START``: At session start
 - ``SESSION_END``: At session end
-
-Global and project configuration can attach bounded shell commands to these two
-lifecycle events through ``[[hooks.scripts]]``. The lists are additive and run
-in descending ``priority`` order; global hooks win equal-priority ties, then
-declaration order is preserved. See :ref:`global-config` and
-:ref:`project-config`. Other hook types carry structured inputs or control-flow
-semantics and are not exposed through the shell adapter.
 
 Generation Hooks
 ~~~~~~~~~~~~~~~~
@@ -84,8 +71,8 @@ Tools can register hooks in their ``ToolSpec`` definition:
        name="linter",
        desc="Automatic linting tool",
        hooks={
-            "file_save": (
-               HookType.FILE_SAVE_POST.value,  # Hook type
+           "file_save": (
+               HookType.FILE_POST_SAVE.value,  # Hook type
                on_file_save,                    # Hook function
                10                               # Priority (higher = runs first)
            )
@@ -100,16 +87,15 @@ You can also register hooks directly:
 .. code-block:: python
 
    from gptme.hooks import register_hook, HookType
-   from gptme.hooks.confirm import ConfirmationResult
 
-   def my_hook_function(manager):
+   def my_hook_function(log, workspace):
        """Custom hook function."""
        # Do something
        return Message("system", "Hook executed!")
 
    register_hook(
        name="my_custom_hook",
-       hook_type=HookType.TURN_PRE,
+       hook_type=HookType.MESSAGE_PRE_PROCESS,
        func=my_hook_function,
        priority=0,
        enabled=True
@@ -122,25 +108,21 @@ Hook functions receive different arguments depending on the hook type:
 
 .. code-block:: python
 
-   # Turn/step hooks
-   def turn_hook(manager):
+   # Message hooks
+   def message_hook(log, workspace):
        pass
 
    # Tool hooks
-   def tool_hook(log, workspace, tool_use):
+   def tool_hook(tool_name, tool_use):
        pass
 
    # File hooks
-   def file_hook(log, workspace, path, content, created=False):
+   def file_hook(path, content, created=False):
        pass
 
    # Session hooks
-   def session_hook(logdir, workspace, initial_msgs):
+   def session_hook(logdir, workspace, manager=None, initial_msgs=None):
        pass
-
-   # Confirmation hooks
-   def confirm_hook(tool_use, preview=None, workspace=None):
-       return ConfirmationResult.confirm()
 
 Hook functions can:
 
@@ -163,7 +145,7 @@ Query Hooks
    all_hooks = get_hooks()
 
    # Get hooks of a specific type
-   tool_hooks = get_hooks(HookType.TOOL_EXECUTE_POST)
+   tool_hooks = get_hooks(HookType.TOOL_POST_EXECUTE)
 
 Enable/Disable Hooks
 ~~~~~~~~~~~~~~~~~~~~
@@ -186,7 +168,7 @@ Unregister Hooks
    from gptme.hooks import unregister_hook, HookType
 
    # Unregister from specific type
-   unregister_hook("my_hook", HookType.FILE_SAVE_POST)
+   unregister_hook("my_hook", HookType.FILE_POST_SAVE)
 
    # Unregister from all types
    unregister_hook("my_hook")
@@ -228,7 +210,7 @@ Automatically run pre-commit checks after files are saved:
        desc="Automatic pre-commit checks",
        hooks={
            "precommit_check": (
-               HookType.FILE_SAVE_POST.value,
+               HookType.FILE_POST_SAVE.value,
                run_precommit,
                5  # Run after other hooks
            )
@@ -286,44 +268,9 @@ Automatically lint files after saving:
        name="linter",
        desc="Automatic Python linting",
        hooks={
-           "lint": (HookType.FILE_SAVE_POST.value, lint_file, 5)
+           "lint": (HookType.FILE_POST_SAVE.value, lint_file, 5)
        }
    )
-
-Built-in Hooks
---------------
-
-gptme ships with several built-in hooks that provide core functionality:
-
-**Session & Context**
-
-- ``active_context``: Selects relevant files to include before generation
-- ``agents_md_inject``: Loads AGENTS.md/CLAUDE.md when the working directory changes
-- ``cwd_tracking``: Tracks the current working directory across tool calls
-- ``time_awareness``: Injects current time into context
-- ``token_awareness``: Monitors token budget and warns when approaching limits
-- ``cost_awareness``: Tracks and reports LLM API costs
-- ``cache_awareness``: Surfaces cache hit rates for prompt caching
-
-**Tool Confirmation**
-
-- ``cli_confirm``: Terminal-based tool confirmation with preview
-- ``auto_confirm``: Auto-approves tools in autonomous/non-interactive mode
-- ``server_confirm``: Confirmation via WebUI/API for server mode
-
-**User Input**
-
-- ``elicitation``: Structured user input (forms, choices) in CLI
-- ``server_elicit``: Elicitation via WebUI/API for server mode
-- ``form_autodetect``: Detects when assistant output contains form-like choices
-
-**Code Quality**
-
-- ``markdown_validation``: Detects codeblock cut-offs in generated content
-
-**Agent Awareness**
-
-- ``workspace_agents``: Detects parallel agents (gptme, Claude Code, Codex, Goose, OpenCode, Amp) running in the same workspace
 
 Best Practices
 --------------
@@ -393,7 +340,7 @@ Example: Converting pre-commit checks to a hook
    tool = ToolSpec(
        name="precommit",
        hooks={
-           "check": (HookType.TURN_POST.value, precommit_hook, 5)
+           "check": (HookType.MESSAGE_POST_PROCESS.value, precommit_hook, 5)
        }
    )
 

@@ -1,71 +1,63 @@
 Finetuning
 ==========
 
-This page documents the experimental fine-tuning support that still exists in
-the repository. It is not a maintained end-to-end training guide.
+NOTE: this document is a work in progress!
 
-## Current scope
+This document aims to provide a step-by-step guide to finetuning a model on conversations from gptme.
 
-Today `gptme` ships one helper for this workflow:
-`scripts/train/collect.py`.
+The goal of fine-tuning a model for gptme is to:
 
-That script:
+ - Teach the tools available in gptme
+ - Update out-of-date knowledge and conventions
+ - Improve its ability to recover from errors
 
-- reads local conversation logs from `~/.local/share/gptme/logs/`
-- filters out generated-name/test conversations and low-quality chats
-- strips leading system prompts
-- renders each conversation with the selected Hugging Face chat template
-- writes `train.csv` and `train.jsonl`
 
-The files are written to your current working directory, not to a `train/`
-subdirectory in the repo.
+## Step 1: Gather the data
 
-## Collect local conversations
+To fine-tune we need something to fine-tune on.
 
-From the repository root, run:
+We will fine-tune on our own conversation history, combined with a subset of the [OpenAssistant dataset][oa-dataset] to extend the training data with relevant examples.
+
+We collect our own conversation history by running the following command:
 
 ```bash
-./scripts/train/collect.py --model "HuggingFaceH4/zephyr-7b-beta"
+./train/collect.py --model "HuggingFaceH4/zephyr-7b-beta"  # or whatever model you intend to fine-tune
 ```
 
-Pick a model whose chat template matches the format you want in the resulting
-training data. The script uses `transformers.pipeline(...)` and
-`tokenizer.apply_chat_template(...)` to turn stored chats into prompt text.
-Run it in an environment where `torch` and `transformers` are already
-installed.
+This will create files `train.csv` and `train.jsonl` in the `train` directory.
 
-## What is not maintained here
+TODO: describe how to get the OpenAssistant dataset
+TODO: describe how to use exported ChatGPT conversations
 
-This page intentionally does **not** claim a supported workflow for:
+## Step 2: Prepare the data
 
-- mixing in OpenAssistant or other public datasets
-- importing exported ChatGPT conversations
-- splitting train and validation sets
-- training with a specific stack such as Axolotl, Transformers, or OpenPipe
+We need to prepare the data for fine-tuning. This involves:
 
-Older revisions of this page sketched those steps, but they were incomplete and
-had drifted out of sync with the repo. Until `gptme` grows a maintained
-fine-tuning pipeline again, treat this document as a narrow note about the
-collector script rather than a full recipe.
+ - Extend the data with examples from the OpenAssistant dataset
+ - Splitting the data into train and validation sets
+   - We might want to make sure that the validation set is comprised of examples from gptme, and not from the OpenAssistant dataset.
 
-## Training stack pointers
+TODO...
 
-If you want to take the exported data further, start with upstream docs for the
-training stack you actually plan to use:
+## Step 3: Fine-tune the model
 
-- [Axolotl][axolotl]
-- [Hugging Face Transformers][hf-transformers]
-- [Examples for Llama fine-tuning][llama-finetuning]
-- [OpenPipe][openpipe]
+Options:
+
+ - [axolotl][axolotl]
+   - Does it support Mistral? (and by extension Zephyr)
+ - [Hugging Face transformers][hf-transformers]
+   - [Examples for Llama2][llama-finetuning] by Meta
+ - [OpenPipe][openpipe]?
+   - Looks interesting, but not sure if it's relevant for us.
+
+TODO...
 
 ## Model suggestions
 
-- `HuggingFaceH4/zephyr-7b-beta`
-- `teknium/Replit-v2-CodeInstruct-3B`
-  - This was previously used for testing/debugging, but availability and local
-    hardware support may vary.
+ - HuggingFaceH4/zephyr-7b-beta
+ - teknium/Replit-v2-CodeInstruct-3B
+   - I had issues with this one on M2, but would be good to have some 3B model as an example used in testing/debug.
 
+[oa-datasets]: https://projects.laion.ai/Open-Assistant/docs/data/datasets
 [axolotl]: https://github.com/OpenAccess-AI-Collective/axolotl
-[hf-transformers]: https://huggingface.co/docs/transformers/training
 [llama-finetuning]: https://ai.meta.com/llama/get-started/#fine-tuning
-[openpipe]: https://openpipe.ai/

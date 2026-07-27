@@ -10,7 +10,7 @@ gptme provides the following commands:
 
 This is the full CLI reference. For a more concise version, run ``gptme --help``.
 
-.. click:: gptme.cli.main:main
+.. click:: gptme.cli:main
    :prog: gptme
    :nested: full
 
@@ -22,10 +22,6 @@ This is the full CLI reference. For a more concise version, run ``gptme --help``
    :prog: gptme-eval
    :nested: full
 
-.. click:: gptme.cli.auth:main
-   :prog: gptme-auth
-   :nested: full
-
-.. click:: gptme.cli.util:main
+.. click:: gptme.util.cli:main
    :prog: gptme-util
    :nested: full

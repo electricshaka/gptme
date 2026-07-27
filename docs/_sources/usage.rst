@@ -18,23 +18,22 @@ To get inspiration for your first prompt, see the :doc:`examples`.
    :local:
    :backlinks: none
 
-.. _usage-commands:
-
 Commands
 --------
 
-gptme provides slash-commands for various actions within the chat.
-For the complete reference, see :doc:`commands`.
+.. TODO: use autodoc from source, like cli reference
 
-Common commands:
+You can use these slash-commands for various actions within the chat:
 
-- ``/help`` - Show available commands
-- ``/undo [n]`` - Undo the last n actions
+- ``/undo`` - Undo the last action
 - ``/log`` - Show the conversation log
+- ``/tools`` - Show available tools
 - ``/edit`` - Edit the conversation in your editor
-- ``/model`` - Show or switch the current model
-- ``/models`` - List available models
-- ``/tokens`` - Show token usage and costs
+- ``/rename`` - Rename the conversation
+- ``/fork`` - Create a copy of the conversation
+- ``/summarize`` - Summarize the conversation
+- ``/replay`` - Re-execute codeblocks in the conversation
+- ``/help`` - Show help message
 - ``/exit`` - Exit the program
 
 Interfaces
@@ -127,86 +126,6 @@ The ``-`` separator allows you to chain multiple prompts together, letting the a
 
 This is particularly useful for breaking down complex tasks into steps and creating :doc:`automation` workflows.
 
-Queue follow-up prompts
-^^^^^^^^^^^^^^^^^^^^^^^
-
-If another ``gptme`` process is already busy in a conversation, queue the next
-user turn from a second terminal instead of waiting for the current step to
-finish:
-
-.. code-block:: bash
-
-    gptme-util chats send chat-123 "once the tests finish, summarize the failures"
-
-The running conversation will drain the queued prompt on its next turn. Use
-``gptme-util chats list`` if you need to look up the conversation ID first.
-
-Tool Selection Patterns
-^^^^^^^^^^^^^^^^^^^^^^^
-
-Use ``--tools`` to control which tools are available.
-
-- ``--tools read,append`` replaces defaults with exactly those tools.
-- ``--tools +computer`` adds the ``computer`` tool on top of defaults.
-
-.. code-block:: bash
-
-    # Add computer use while keeping the standard default tools
-    gptme --tools +computer "take a screenshot and summarize what you see"
-
-For long visual tasks, use a subagent profile to avoid bloating parent context
-with repeated screenshots:
-
-.. code-block:: python
-
-    # Desktop interaction (mouse, keyboard, screenshots)
-    subagent(
-        "computer-use",
-        "Click the Submit button, wait for the modal, and screenshot the result",
-    )
-
-    # Web browsing and testing
-    subagent(
-        "browser-use",
-        "Navigate web app UI, capture evidence, and return a concise bug report",
-    )
-
-See available profiles with:
-
-.. code-block:: bash
-
-    gptme-util profile list
-
-Minimal context mode
-^^^^^^^^^^^^^^^^^^^^
-
-When you want a tighter startup prompt for a specialized task, combine a short
-system prompt, a narrow tool set, and selective context:
-
-.. code-block:: bash
-
-    gptme --system short --tools shell,read,patch,save --context files "fix the failing test"
-
-Use ``--no-workspace`` to skip all project-specific context (prompt files and
-``context_cmd`` output) in one flag — tools and the core prompt are still
-included:
-
-.. code-block:: bash
-
-    gptme --no-workspace --system short --tools shell,read,patch,save "apply this patch"
-
-Measure the prompt before and after with:
-
-.. code-block:: bash
-
-    gptme --show-prompt-stats
-
-That prints per-section token counts for the startup system prompt so you can
-see whether the cost is coming from tool docs, user profile text, workspace
-prompt files, or dynamic ``context_cmd`` output.
-
-For a deeper recipe, see :doc:`howto/minimal-context`.
-
 Skip confirmation prompts
 ^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -226,25 +145,6 @@ The ``--non-interactive`` flag runs gptme in a mode that terminates after comple
     gptme --non-interactive 'create a snake game using curses in snake.py, dont run it' '-' 'make the snake green and the apple red'
 
 Note: ``--non-interactive`` implies ``--no-confirm``, so you don't need to specify both.
-
-Machine-readable output
-^^^^^^^^^^^^^^^^^^^^^^^
-
-Pair ``--non-interactive`` with ``--output-format json`` when stdout needs to
-be consumed by another program. In JSON mode, gptme emits one JSON object per
-line on stdout (JSONL):
-
-.. code-block:: bash
-
-    gptme --non-interactive --output-format json 'summarize this repository'
-
-Use ``--resume`` to continue an existing automated conversation without
-supplying a new prompt. This also picks up any queued follow-up prompts for the
-current conversation before exiting:
-
-.. code-block:: bash
-
-    gptme --non-interactive --output-format json --resume
 
 .. _pre-commit:
 

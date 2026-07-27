@@ -26,57 +26,29 @@ See the `README <https://github.com/gptme/gptme/blob/master/README.md>`_ file fo
    :caption: User Guide
 
    getting-started
-   system-dependencies
    usage
    examples
-   howto/index
    tools
-   commands
-   cli
-   tui
    config
    providers
-   providers-custom
-   provider-integration
-   model-routing
-   security
-
-.. toctree::
-   :maxdepth: 2
-   :caption: Agents & Extensibility
-
-   features
-   concepts
-   glossary
    agents
    server
    mcp
-   acp
-   lessons
-   skills
+   cli
 
 .. toctree::
    :maxdepth: 2
    :caption: Developer Guide
 
    contributing
-   pr-lifecycle
    building
-   custom_tool
-   hooks
-   plugins
    prompts
-   api
    evals
    bot
    finetuning
-
-.. toctree::
-   :maxdepth: 2
-   :caption: Design Documents
-
-   design/hook-based-confirmations
-   design/elicitation
+   custom_tool
+   hooks
+   api
 
 .. toctree::
    :maxdepth: 2
@@ -84,7 +56,6 @@ See the `README <https://github.com/gptme/gptme/blob/master/README.md>`_ file fo
 
    alternatives
    arewetiny
-   misc/acronyms
    timeline
    changelog
 

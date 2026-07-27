@@ -3,7 +3,7 @@ Custom Tools
 
 Introduction
 ------------
-There are three main approaches to extending gptme's available tools:
+There are three main approaches to extending gptme's functionality:
 
 1. **Custom Tools**: Native gptme tools that integrate deeply with the assistant.
 2. **Script Tools**: Standalone scripts that can be called via the shell tool.
@@ -50,7 +50,7 @@ When you need deeper integration with gptme, you can create a custom tool by def
 Custom tools are necessary when you need to:
 
 - Attach files/images to messages
-- Get included in the tools section of the system prompt
+- Get included in the tools section
 - Use without shell tool access
 - Validate arguments
 - Handle complex interactions
@@ -118,7 +118,7 @@ Here's a minimal example of a custom tool:
 Command Registration
 --------------------
 
-In addition to defining tools, you can register custom :ref:`commands <commands>` that users can invoke with ``/command`` syntax.
+In addition to defining tools, you can register custom commands that users can invoke with ``/command`` syntax.
 
 Registering Commands in Tools
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -213,38 +213,10 @@ Use **custom tools** when you need:
 - Complex argument validation
 - Operation without shell access
 
-Use ``--tools +./file.py`` for **quick development** — no packaging or ``PYTHONPATH`` needed. Use ``TOOL_MODULES`` for **production** tools that are installed as packages.
-
-Loading Custom Tools
+Registering the Tool
 --------------------
-
-There are two ways to load custom tools: directly from a ``.py`` file (quickest for development), or via a Python module (best for packaged/shared tools).
-
-Loading from a File (``--tools``)
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-The simplest way to use a custom tool is to pass the file path directly via ``--tools``:
-
-.. code-block:: bash
-
-    # Add your tool on top of the default toolset (most common)
-    gptme --tools +./my_tool.py "use the my_tool tool"
-
-    # Replace the default toolset entirely with specific tools
-    gptme --tools save,patch,./my_tool.py "prompt"
-
-    # Load multiple custom tool files (additive — one '+' is enough)
-    gptme --tools +./tools/search.py,./tools/deploy.py "prompt"
-
-The ``+`` prefix adds tools on top of the default toolset. Without ``+``, the argument replaces the entire toolset — so you'd need to explicitly list any built-in tools you still want.
-
-**How it works**: gptme scans the file for top-level ``ToolSpec`` instances and registers them. The file must be a regular ``.py`` file containing at least one ``ToolSpec`` variable (see the example in `Creating a Custom Tool`_ above).
-
-Loading from a Module (``TOOL_MODULES``)
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-For packaged tools, specify the module in the ``TOOL_MODULES`` env variable or
-in your :doc:`project configuration file <config>`:
+To ensure your tool is available for use, you can specify the module in the ``TOOL_MODULES`` env variable or
+setting in your :doc:`project configuration file <config>`, which will automatically load your custom tools.
 
 .. code-block:: toml
 

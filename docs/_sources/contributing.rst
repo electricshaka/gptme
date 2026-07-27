@@ -6,14 +6,6 @@ We welcome contributions to the project. Here is some information to get you sta
 .. note::
     This document is a work in progress. PRs are welcome.
 
-If you already have a change ready, read :doc:`pr-lifecycle` for the current
-pull-request flow: what automation runs, what maintainers look for, and the
-recent response/merge timings contributors can expect.
-
-Looking to **add a new LLM provider**? See :doc:`provider-integration` for the
-dedicated guide covering plugin packages, custom provider configs, and built-in
-provider PRs.
-
 Install
 -------
 
@@ -200,62 +192,3 @@ Release
 -------
 
 To make a release, simply run ``make release`` and follow the instructions.
-
-Issue Labels
-------------
-
-We use a multi-dimensional labeling system to help contributors (both human and autonomous) find appropriate issues to work on.
-
-Difficulty
-~~~~~~~~~~
-
-Indicates estimated effort required:
-
-- ``difficulty: easy`` - Simple, well-scoped tasks (<4 hours)
-- ``difficulty: medium`` - Moderate complexity (4-8 hours)
-- ``difficulty: hard`` - Complex or architectural changes (>8 hours)
-
-Status
-~~~~~~
-
-Shows the current state of an issue:
-
-- ``status: ready`` - Fully specified, ready to start
-- ``status: needs-design`` - Requires design decisions first
-- ``status: blocked`` - Has dependencies or blockers
-- ``status: in-progress`` - Someone is actively working
-- ``status: has-pr`` - A pull request exists
-
-Priority
-~~~~~~~~
-
-Indicates urgency and impact:
-
-- ``priority: critical`` - Blocks users or development
-- ``priority: high`` - Important for upcoming release
-- ``priority: medium`` - Valuable but not urgent
-- ``priority: low`` - Nice to have
-
-Work Type
-~~~~~~~~~
-
-Special markers for contributor matching:
-
-- ``autonomous-friendly`` - Suitable for AI agent work
-- ``needs-human-judgment`` - Requires human decision-making
-- ``good first issue`` - Good for new contributors
-- ``help wanted`` - Community contributions welcome
-
-Finding Issues to Work On
-~~~~~~~~~~~~~~~~~~~~~~~~~
-
-For quick wins:
-  Filter: ``difficulty: easy`` + ``status: ready``
-
-For substantial contributions:
-  Filter: ``difficulty: medium`` + ``status: ready`` + ``autonomous-friendly``
-
-For new contributors:
-  Filter: ``good first issue`` + ``status: ready``
-
-Before starting work on an issue, please comment to indicate you're working on it to avoid duplicate effort.
