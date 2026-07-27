@@ -7,7 +7,7 @@ import logging
 import re
 import shutil
 import textwrap
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from functools import lru_cache
 from pathlib import Path
 
@@ -19,7 +19,7 @@ EMOJI_WARN = "⚠️"
 logger = logging.getLogger(__name__)
 console = Console(log_path=False)
 
-_warned_models = set()
+_warned_models: set[str] = set()
 
 
 @lru_cache
@@ -43,7 +43,7 @@ def get_tokenizer(model: str):
 
 def epoch_to_age(epoch, incl_date=False):
     # takes epoch and returns "x minutes ago", "3 hours ago", "yesterday", etc.
-    age = datetime.now() - datetime.fromtimestamp(epoch)
+    age = datetime.now(tz=timezone.utc) - datetime.fromtimestamp(epoch, tz=timezone.utc)
     if age < timedelta(minutes=1):
         return "just now"
     elif age < timedelta(hours=1):

@@ -10,7 +10,7 @@ import io
 import logging
 from collections.abc import Generator
 from contextlib import redirect_stdout
-from datetime import datetime
+from datetime import datetime, timezone
 from importlib import resources
 from itertools import islice
 from pathlib import Path
@@ -181,7 +181,7 @@ def api_conversation_put(logfile: str):
     # Add any additional messages from request
     for msg in req_json.get("messages", []):
         timestamp: datetime = (
-            isoparse(msg["timestamp"]) if "timestamp" in msg else datetime.now()
+            isoparse(msg["timestamp"]) if "timestamp" in msg else datetime.now(tz=timezone.utc)
         )
         msgs.append(Message(msg["role"], msg["content"], timestamp=timestamp))
 

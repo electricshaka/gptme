@@ -13,7 +13,7 @@ import uuid
 from collections import defaultdict
 from collections.abc import Generator
 from dataclasses import dataclass, field
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from enum import Enum
 from pathlib import Path
 
@@ -120,13 +120,13 @@ class SessionManager:
         """Add an event to all sessions for a conversation."""
         for session in cls.get_sessions_for_conversation(conversation_id):
             session.events.append(event)
-            session.last_activity = datetime.now()
+            session.last_activity = datetime.now(tz=timezone.utc)
             session.event_flag.set()  # Signal that new events are available
 
     @classmethod
     def clean_inactive_sessions(cls, max_age_minutes: int = 60) -> None:
         """Clean up inactive sessions."""
-        cutoff = datetime.now() - timedelta(minutes=max_age_minutes)
+        cutoff = datetime.now(tz=timezone.utc) - timedelta(minutes=max_age_minutes)
         to_remove = []
 
         for session_id, session in cls._sessions.items():

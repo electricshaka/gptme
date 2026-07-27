@@ -15,7 +15,7 @@ Shows time elapsed messages at: 1min, 5min, 10min, 15min, 20min, then every 10mi
 
 import logging
 from collections.abc import Generator
-from datetime import datetime
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
@@ -53,12 +53,12 @@ def add_time_message(
 
         # Initialize conversation start time if first message
         if workspace_str not in _conversation_start_times:
-            _conversation_start_times[workspace_str] = datetime.now()
+            _conversation_start_times[workspace_str] = datetime.now(tz=timezone.utc)
             _shown_milestones[workspace_str] = set()
             return
 
         # Calculate elapsed time in minutes
-        elapsed = datetime.now() - _conversation_start_times[workspace_str]
+        elapsed = datetime.now(tz=timezone.utc) - _conversation_start_times[workspace_str]
         elapsed_minutes = int(elapsed.total_seconds() / 60)
 
         # Determine which milestone to show
@@ -72,7 +72,7 @@ def add_time_message(
             hours = elapsed_minutes // 60
             minutes = elapsed_minutes % 60
 
-            time_str = datetime.now().strftime("%H:%M")
+            time_str = datetime.now(tz=timezone.utc).strftime("%H:%M")
             if hours > 0:
                 elapsed_str = f"{hours}h {minutes}min" if minutes > 0 else f"{hours}h"
             else:
